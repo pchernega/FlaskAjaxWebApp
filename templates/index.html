@@ -65,7 +65,7 @@ body {font-family: Arial;}
   <!-- <h3>Выбор файла</h3> -->
   {% block content %}
     <p>Выберите файл с данными (для задачи классификации используйте имя 'target' для обучающей переменной)</p>
-    <form method='post' action='/result' enctype='multipart/form-data'>
+    <form id="file_form" method='post' action='/result' enctype='multipart/form-data'>
         <p><input type='file' required name='file'></p>
         <!--<p><input type='submit' value='Ok'></p> -->
         <button type="submit" formaction="/action_one">Классификация</button>
@@ -103,6 +103,38 @@ function openTab(evt, cityName) {
 
 // Get the element with id="defaultOpen" and click on it
 document.getElementById("defaultOpen").click();
+
+//request calculation result from server with $.ajax()
+ $('#id_form').submit(function(e) {
+                    e.preventDefault();
+
+                    var data = {};
+                    var Form = this;
+
+                    $.each(this.elements, function(i, v) {
+                        var input = $(v);
+                        data[input.attr("name")] = input.val();
+                        delete data["undefined"];
+                    });
+
+                     $.ajax({
+                        type: 'POST',
+                        url: '/api/say_name',
+                        dataType: 'json',
+                        contentType: 'application/json; charset=utf-8',
+                        data: JSON.stringify(data),
+                        context: Form,
+                        success: function(callback) {
+                            console.log(callback);
+                            // Watch out for Cross Site Scripting security issues when setting dynamic content!
+                             $('#resp').text('Hello ' + callback.first_name + ' ' + callback.last_name  + '!')
+                            //$(this).text('Hello ' + callback.first_name + ' ' + callback.last_name  + '!');
+                        },
+                        error: function() {
+                            $(this).html("error!");
+                        }
+                    });
+                });
 </script>
      
 </body>
