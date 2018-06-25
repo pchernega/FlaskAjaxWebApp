@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+{% block content %}
+    <div id="response">
+        <p>Data set:</p>
+        <pre>{{content}}
+        ...</pre>
+        <p>Cross-validated accuracy: {{accuracy}}</p>
+        <p>ROC curve</p>
+        <p><img src='static/images/{{filename}}'></p>
+    </div>
+{% endblock %}
