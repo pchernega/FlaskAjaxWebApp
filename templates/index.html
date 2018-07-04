@@ -56,8 +56,8 @@ body {font-family: Arial;}
 
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'select_file')" id="defaultOpen">Выбор файла</button>
-  <button class="tablinks" onclick="openTab(event, 'classification')">Классификация</button>
-  <button class="tablinks" onclick="openTab(event, 'clustering')">Кластеризация</button>
+  <button class="tablinks" onclick="openTab(event, 'classification')" id="classific_button">Классификация</button>
+  <button class="tablinks" onclick="openTab(event, 'clustering')" id="clustering_button">Кластеризация</button>
 </div>
 
 <div id="select_file" class="tabcontent">
@@ -65,29 +65,34 @@ body {font-family: Arial;}
   <!-- <h3>Выбор файла</h3> -->
   {% block content %}
     <p>Выберите файл с данными (для задачи классификации используйте имя 'target' для обучающей переменной)</p>
-    <form id="file_form" method='post' action='/result' enctype='multipart/form-data'>
-        <p><input type='file' required name='file'></p>
+    <form id="file_form" method='post' enctype='multipart/form-data'>
+        <p><input id="file_id" type='file' required name='file'></p>
         <!--<p><input type='submit' value='Ok'></p> -->
-        <button type="submit" formaction="/action_one">Классификация</button>
-        <button type="submit" formaction="/action_two">Кластеризация</button>
+        <!--<button type="submit">Классификация</button>
+        //<button type="submit">Кластеризация</button>-->
+        <button type="button" onclick="submitForm('/result_classification', 'classific_button','#classific_res')">Классификация</button>
+        <button type="button" onclick="submitForm('/result_clastering', 'clustering_button','#clustering_res')">Кластеризация</button>
     </form>
     {% endblock %}
+<!-- <p id="test">Test</p> -->
 </div>
 
 <div id="classification" class="tabcontent">
   <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
   <h3>Классификация</h3>
-  <p>Тут размещаются результаты кластеризации</p>
+  <!--Тут размещаются результаты классификации-->
+  <p id="classific_res"></p>
 </div>
 
 <div id="clustering" class="tabcontent">
   <span onclick="this.parentElement.style.display='none'" class="topright">&times</span>
   <h3>Кластеризация</h3>
-  <p>Тут размещаются результаты классификации</p>
+  <!--Тут размещаются результаты кластеризации-->
+  <p id="clustering_res"></p>
 </div>
 
 <script>
-function openTab(evt, cityName) {
+function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -97,15 +102,86 @@ function openTab(evt, cityName) {
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
-    document.getElementById(cityName).style.display = "block";
+    document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
 
 // Get the element with id="defaultOpen" and click on it
 document.getElementById("defaultOpen").click();
+</script>
 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
 //request calculation result from server with $.ajax()
- $('#id_form').submit(function(e) {
+function submitForm(url, clickBtnId, resDispId){
+    var form_data = new FormData($('#file_form')[0]);
+    $.ajax({
+     type     : "POST",
+     cache    : false,
+     url      : url,
+     data     : form_data,
+     contentType: false,
+     cache    : false,
+     processData: false,
+     async     : false,
+     success  : function(data) {
+         $(resDispId).html($(data).find('#response').html());
+         document.getElementById(clickBtnId).click();
+     },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(xhr.status);
+        alert(thrownError);
+      }
+    }); 
+}
+
+/* $("#file_form").submit(function(e){
+    var $form = $(this);
+    var form_data = new FormData($('#file_form')[0]);
+    e.preventDefault();
+
+    $.ajax({
+     type     : "POST",
+     cache    : false,
+     url      : $form.attr('action'),
+     data     : form_data,
+     contentType: false,
+     cache    : false,
+     processData: false,
+     async     : false,
+     success  : function(data) {
+         //$("#classific_res").load("/result_classification.html #response");
+         $("#classific_res").html($(data).find('#response').html());
+         //$("#classific_button").trigger("click");
+         //$("#classific_button").click();
+         document.getElementById("classific_button").click();
+         //console.log(data);
+     },
+      error: function (xhr, ajaxOptions, thrownError) {
+        alert(xhr.status);
+        alert(thrownError);
+      }
+    });
+ })
+ */
+
+/*$.ajax({
+    //url: $form.attr('action'),
+    url: '/result',
+    //data: $('#file').attr('files'),
+    data: $('#file_id'),
+    cache: false,
+    contentType: 'multipart/form-data',
+    processData: false,
+    type: 'POST',
+    success: function(data){
+        alert(data);
+    }
+});
+*/
+
+ /* $('#id_form').submit(function(e) {
                     e.preventDefault();
 
                     var data = {};
@@ -135,6 +211,7 @@ document.getElementById("defaultOpen").click();
                         }
                     });
                 });
+                */
 </script>
      
 </body>

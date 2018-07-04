@@ -47,7 +47,7 @@ def draw_roc_curve(clr, data, target):
 def index():
     return render_template('index.html')
     
-@app.route('/result', methods=('POST',))
+@app.route('/result_classification', methods=['GET', 'POST'])
 def result():
     file = request.files['file']
     data = io.StringIO(file.read().decode('utf-8'))
@@ -58,7 +58,7 @@ def result():
     accuracy = get_accuracy(lr, data, target)
     filename = draw_roc_curve(lr, data, target)
     return render_template(
-        'result.html', 
+        'result_classification.html',
         content=content, 
         accuracy=accuracy,
         filename=filename
